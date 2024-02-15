@@ -23,18 +23,20 @@ def save_data(data):
         json.dump(data, f)
 
 
-def send_scheduled_messages():
+def send_message(message):
     data = load_data()
-    message_morning = "Доброе утро!"
-    message_evening = "Спокойной ночи, сладких снов и апельсинов! 🍊🍊🍊"
+    if message == "morning":
+        msg = "Доброе утро!"
+    elif message == "evening":
+        msg = "Спокойной ночи, сладких снов и апельсинов! 🍊🍊🍊"
     for user_id in data:
-        bot.send_message(user_id, message_morning)
-        bot.send_message(user_id, message_evening)
-        bot.send_sticker(user_id, 'CAACAgIAAxkBAAEDfAxlzKFOIybEIMUtkRlBdn-WQwIfaQACODEAAkpvYUhVZUvs2_rBqTQE')
+        bot.send_message(user_id, msg)
+        if message == "evening":
+            bot.send_sticker(user_id, 'CAACAgIAAxkBAAEDfAxlzKFOIybEIMUtkRlBdn-WQwIfaQACODEAAkpvYUhVZUvs2_rBqTQE')
 
 
-schedule.every().day.at("01:30").do(send_scheduled_messages)
-schedule.every().day.at("17:00").do(send_scheduled_messages)
+schedule.every().day.at("01:30").do(send_message, "morning")
+schedule.every().day.at("17:00").do(send_message, "evening")
 
 
 @bot.message_handler(commands=['start'])
