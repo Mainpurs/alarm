@@ -15,7 +15,6 @@ def load_data():
             data = json.load(f)
     except FileNotFoundError:
         data = {}
-
     return data
 
 
@@ -24,43 +23,31 @@ def save_data(data):
         json.dump(data, f)
 
 
-def send_scheduled_message():
+def send_scheduled_messages():
     data = load_data()
-    save_data(data)
-    data = load_data()
-    message = "Доброе утро!"
+    message_morning = "Доброе утро!"
+    message_evening = "Спокойной ночи, сладких снов и апельсинов! 🍊🍊🍊"
     for user_id in data:
-        bot.send_message(user_id, message)
-
-
-schedule.every().day.at("01:30").do(send_scheduled_message)
-
-
-def send_scheduled_message2():
-    data = load_data()
-    save_data(data)
-    data = load_data()
-    message = "Спокойной ночи, сладких снов и апельсинов! 🍊🍊🍊"
-    for user_id in data:
-        bot.send_message(user_id, message)
+        bot.send_message(user_id, message_morning)
+        bot.send_message(user_id, message_evening)
         bot.send_sticker(user_id, 'CAACAgIAAxkBAAEDfAxlzKFOIybEIMUtkRlBdn-WQwIfaQACODEAAkpvYUhVZUvs2_rBqTQE')
 
 
-schedule.every().day.at("17:00").do(send_scheduled_message2)
+schedule.every().day.at("01:30").do(send_scheduled_messages)
+schedule.every().day.at("17:00").do(send_scheduled_messages)
 
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    data = load_data()
     user_id = message.chat.id
     bot.send_message(user_id, 'Ок')
+    data = load_data()
     if str(user_id) not in data:
         data[str(user_id)] = ''
     save_data(data)
-    # Запускаем планировщик в отдельном потоке
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
 
 
-bot.infinity_polling()
+# Запускаем планировщик в отдельном потоке
+while True:
+    schedule.run_pending()
+    time.sleep(1)
